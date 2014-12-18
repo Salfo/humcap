@@ -1,0 +1,10 @@
+Package: humcap
+Title: To Compute Human Capital Estimates
+Version: 0.1
+Authors@R: "Salfo Bikienga <sbikienga@gmail.com> [aut, cre]"
+Description: Compute human capital estimates by state, and by year.
+    The lm or rq functions can be used...
+Depends: R (>= 3.1.2)
+License: What license is it under?
+LazyData: true
+URL: http://github.com/Salfo/humcap
