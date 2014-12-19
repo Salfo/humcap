@@ -11,6 +11,7 @@
 #' @examples
 #' RealValueConverter()
 #load("data/cpi_Ind.RData")
+<<<<<<< HEAD
 RealValueConverter <-function(df, cpi = cpi_Ind, index=232.957, begin = 1990, end = 2013){
   beg = begin
   end1 = end
@@ -20,6 +21,14 @@ RealValueConverter <-function(df, cpi = cpi_Ind, index=232.957, begin = 1990, en
   init <- beg-1989
   fin  <- end1+1 - begin
   cpi_data <- data.frame(select, cpi[init:fin])
+=======
+RealValueConverter <- function(df, cpi = cpi_Ind, index=232.957, begin = 1990, end = 2013){
+  beg = begin; end = end
+  select <-as.data.frame(seq(beg,end,by=1))
+  names(select) <-"Year"
+  names(cpi) <- "CPI"
+  cpi_data <- data.frame(select, cpi)
+>>>>>>> 12f172d35e39d2bc62c5c672569eeb260cd7053f
   cpi_data$coef<-cpi_data$cpi/index
 
   realvalues <- df # Initiate the real values dataframe
@@ -30,6 +39,10 @@ RealValueConverter <-function(df, cpi = cpi_Ind, index=232.957, begin = 1990, en
 }
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 12f172d35e39d2bc62c5c672569eeb260cd7053f
 #' A moving average calculator
 #'
 #' This function smooths the data (three year moving average).
