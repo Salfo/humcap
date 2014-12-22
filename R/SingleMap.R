@@ -51,7 +51,7 @@ unimap <- function(df){
 
   plot(0, 0, type="n", axes=FALSE, xlim=c(0,30), ylim=c(0,2))
   rect(c(5,10,15,20), c(1,1,1,1), c(10,15,20,25), c(1.25,1.25,1.25,1.25),
-       col=sapply(c(6,11,16,21), getColor), border="white", lwd=0.4)
+       col= c("#CCCCCC", "#999999", "#666666", "#000000"), border="white", lwd=0.4)
   text(15, 1.35, "legend")
   text(c(10,15,20), c(0.9,0.9,0.9), c("1/4","1/2","3/4"), cex=0.8) # Tick labels
 
