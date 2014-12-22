@@ -88,3 +88,46 @@ head(t_series[, 1:5])
 ts_convert(testmod2$All[,1:5], begin = 1990, end = 1994)[,1:5] # print few states
 ```
 
+The remainings are details, and should be easy to understand, and possibly extand.
+
+## Construct a barplot of the means
+
+The ggplot2 package is used for most of the graphs in the original paper. This implies that the ggplot2 package must be unstalled and loaded before constructing the following graph.
+```{r}
+#intall.packages("ggplot2")
+library(ggplot2)
+barplotData<- RealValueConverter(testmod2$All)
+
+Per_Mean <-as.data.frame(apply(X=barplotData, MARGIN=1, FUN=mean))
+states<-c( "AL","AK","AZ","AR","CA","CO","CT","DE",
+           "DC","FL","GA","HI","ID","IL","IN","IA",
+           "KS","KY","LA","ME","MD","MA","MI","MN",
+           "MS","MO","MT","NE","NV","NH","NJ","NM",
+           "NY","NC","ND","OH","OK","OR","PA","RI",
+           "SC","SD","TN","TX","UT","VT","VA","WA",
+           "WV","WI","WY") # Short state names
+
+Period_Mean <- data.frame(states, Per_Mean) # create a dataframe with two variables
+names(Period_Mean) <- c("State", "Mean") # Create nicer variables names
+
+Mean_Plot <- ggplot(Period_Mean, aes(reorder(State, Mean), Mean, fill=State)) +
+  geom_bar(stat="identity") + coord_flip() + labs(y = "Study Period Average", 
+                                                  x = " State") +
+  ggtitle("Real Per Capita Hourly Average of HC Wage Premium") + 
+  theme(legend.position="none") +  geom_text(aes(State,Mean, label = State, size=0.8)) +
+  theme(axis.text.y=element_text(size=rel(0.8)))
+```
+
+Print the figure
+```{r, fig.height= 6 , fig.width= 8}
+print(Mean_Plot)
+```
+
+The same function could be used to plot a barplot of the growth rate found in the paper. In the paper, the geometric growth rate is used. To compute the geometric growth rate, the average of the first three estimates are used as the initial value, and the average of the last three estimates are used as the end value.
+
+## Construct a Map
+An extended tutorial on how to construct maps can be found at: http://flowingdata.com/2013/07/08/small-maps-and-grids/.
+ In the paper, the maps constructed are based on three year moving average data. 
+ 
+
+

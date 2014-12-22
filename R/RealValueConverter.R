@@ -11,8 +11,8 @@
 #' @examples
 #' RealValueConverter()
 #load("data/cpi_Ind.RData")
-<<<<<<< HEAD
-RealValueConverter <-function(df, cpi = cpi_Ind, index=232.957, begin = 1990, end = 2013){
+
+RealValueConverter <- function(df, cpi = cpi_Ind, index=232.957, begin = 1990, end = 2013){
   beg = begin
   end1 = end
   select <-as.data.frame(seq(beg,end1,by=1))
@@ -21,58 +21,12 @@ RealValueConverter <-function(df, cpi = cpi_Ind, index=232.957, begin = 1990, en
   init <- beg-1989
   fin  <- end1+1 - begin
   cpi_data <- data.frame(select, cpi[init:fin])
-=======
-RealValueConverter <- function(df, cpi = cpi_Ind, index=232.957, begin = 1990, end = 2013){
-  beg = begin; end = end
-  select <-as.data.frame(seq(beg,end,by=1))
-  names(select) <-"Year"
-  names(cpi) <- "CPI"
-  cpi_data <- data.frame(select, cpi)
->>>>>>> 12f172d35e39d2bc62c5c672569eeb260cd7053f
   cpi_data$coef<-cpi_data$cpi/index
 
-  realvalues <- df # Initiate the real values dataframe
-  for(i in 1:51){
-    realvalues[i, ] <- df[i, ]/cpi_data$coef
-  }
-  return(realvalues)
-}
+      realvalues <- df # Initiate the real values dataframe
+      for(i in 1:51){
+        realvalues[i, ] <- df[i, ]/cpi_data$coef
+      }
+      return(realvalues)
+    }
 
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 12f172d35e39d2bc62c5c672569eeb260cd7053f
-#' A moving average calculator
-#'
-#' This function smooths the data (three year moving average).
-#' @param df dataframe
-#' @keywords moving average
-#' @export
-#' @examples
-#' smoother3()
-smoother3 <- function(df){
-  smoothed_data <- df
-  cols <- ncol(smoothed_data)
-  for(i in 2:(cols-1)){
-    smoothed_data[,i] <- rowMeans(df[,(i-1):(i+1)])
-  }
-  smooth_d <- smoothed_data[, -c(1,cols)]
- return(smooth_d)
-}
-
-
-#' A time series converter
-#'
-#' This function format the data into time series format.
-#' @param df dataframe
-#' @keywords Time Series
-#' @export
-#' @examples
-#' ts_convert()
-ts_convert <-function(df, begin = 1990, end = 2013){
-  smooth_data <- smoother3(df)
-  time_series  <- as.data.frame (t(smooth_data))
-  time_series$Year <- seq(from=(begin + 1), to = (end-1), by = 1)
-  return(time_series)
-}
