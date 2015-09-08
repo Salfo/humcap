@@ -9,10 +9,10 @@ vignette: >
   %\usepackage[utf8]{inputenc}
 ---
 
-The humcap package provides functions for computing estimates of human capital premiums. The package derives from the "Human Capital Measurement: A Quantiles Regression Approach" paper.
+The humcap package provides functions for computing estimates of human capital premiums. The estimated capital premiums can then be used to compute human capital stocks. The package is written to make the replication of the "Human Capital Measurement: A Quantiles Regression Approach" paper easy.
 
 ## Installing the package
-You will need the devtools package to install packages from github. To install the devtool package, run:
+The package is in github repository. You will need the devtools package to install packages from github. To install the devtool package, run, after uncommenting it, the following line of code:
 ```{r}
 #install.packages("devtools")
 ```
@@ -23,18 +23,23 @@ Then install the humcap package as follows:
 library(humcap) # load the package
 ```
 
-The package has essentially two main functions. The hum_cap() function and the mult_hum_cap() function. The hum_cap() function takes a dataset and compute a single human capital premium estimate. The package comes with a dataset.
+The package has essentially two main functions. The hum_cap() function and the mult_hum_cap() function. The hum_cap() function takes a dataset and compute a single human capital premium estimate. The package comes with a dataset. The dataset is the current population survey data from 1990 to 2013, tellingly named cps1990_2013.
 ```{r}
 data(cps1990_2013) 
-str(cps1990_2013)
+str(cps1990_2013) # look at what is in the dataset
 ```
+
+Let's subset the data to explore the function hum_cap(). Again, this function takes a dataset and returns estimates of human capital premium for male female, and All, that is the combined for male and female.
 
 ```{r, message=FALSE, warning=FALSE}
 library(dplyr) # dplyr is needed for data subsetting
 testdata <- filter(cps1990_2013, state == "Nebraska", year == 2013)
 ```
-```{r}
-lin<-lhrswage~educ2+ exp + exp_sq+marst1 # define the model
+
+The subsetted data is the data for Nebraska, 2013. 
+
+```{r, warning=FALSE}
+lin<-lhrswage~educ2+ exp + exp_sq + marst1 # define the model
 testmod <- hum_cap(data= testdata, formula = lin, tau = 0.2, weights = testdata$wtsupp, FUN = lm) 
 testmod$hc.prem # output human capital premium
 ```
@@ -42,14 +47,17 @@ Uncomment the following code to see the full output of the function.
 ```{r}
 # testmod
 ```
-To use quantile regression estimations, replace the FUN argument lm with rq. But, for the rq function to work, we need to load the quantreg package.
+
+Note that the argument FUN takes the lm() function. To use quantile regression estimations, replace the FUN argument lm with rq. However, for the rq function to work, we need to load the quantreg package.
 
 ```{r, message=FALSE, warning=FALSE}
 require(quantreg) # load the quantreg package
 testmod1 <- hum_cap(data= testdata, formula = lin, tau = 0.2, weights = testdata$wtsupp, FUN = rq) 
 testmod1$hc.prem # output human capital premium
 ```
-To run the hum_cap() function for multiple years, and multiple states, the mult_hum_cap() function is handy.
+To run the hum_cap() function for multiple years, and multiple states, the mult_hum_cap() function is handy. Uncomment the following to try the fuction. Play around with the function by changing some of its arguments. 
+
+The function throws warnings messages that can be safely ignored. These warnings are ineherant to the rq() function if FUN takes rq, or the tau argument if FUN take lm.
 ```{r, message=FALSE, warning=FALSE}
 #testmod11 <- mult_hum_cap(data= cps1990_2013, formula = lin, tau = 0.2,
 #weights = testdata$wtsupp, FUN = rq, begin = 2011, end = 2013)
@@ -61,14 +69,16 @@ Note that the above code takes time to excecute. That should be expected, since 
 The package provides additional functions for post processing the estimates. 
 
 ### RealValueConverter() function
-The RealValueConverter() function converts the estimates into real values. The default of the function is the 2013 dollar value. For simplicity, the package provides the estimates of the preinstalled data. These estimates are named testmod2.
+The RealValueConverter() function converts the estimates (nominal values) into real values. The default of the function is the 2013 dollar value. To allow you to try the additional functions, the package provides the estimates of the preinstalled data. These estimates are named testmod2.
 ```{r}
-data(testmod2) # load precomputed estimates
-str(testmod2)
-head(testmod2[[1]][,1:5], n = 10) # print out few estimates (Nominal values)
-head(RealValueConverter(df = testmod2[[1]], begin = 1990, 
-                        end = 2013)[,1:6]) # print out few estimates (Real values)
-# Another example using RealValueConverter()
+data(testmod2) # load precomputed estimates of human capital premiums
+str(testmod2) # see what is in testmod2
+head(testmod2[[1]][,1:6]) # print out few estimates (Nominal values)
+
+real_values <- RealValueConverter(df = testmod2[[1]], begin = 1990, 
+                        end = 2013)
+head(real_values[,1:6]) # print out few estimates (Real values)
+# Another example using RealValueConverter(). Note the changes in ending date
 head(RealValueConverter(df = testmod2[[1]][,1:6], begin = 1990, end = 1995))
 ```
 
@@ -76,19 +86,18 @@ head(RealValueConverter(df = testmod2[[1]][,1:6], begin = 1990, end = 1995))
 The smoother3() function produces a three year moving average estimates.
 ```{r}
 smooth_data <- smoother3(testmod2$All)
-head(smooth_data[,1:5])
+head(smooth_data[,1:6])
 ```
 
 ### ts_convert() function
-The ts_convert() function smooths the estimates, then convert them into a time series format.
+The ts_convert() function smooths the estimates, then convert them into a time series format. This function is intends to make the graphing of time series easier.
 ```{r}
-t_series <- ts_convert(testmod2$All)
-head(t_series[, 1:5])
+t_series <- ts_convert(testmod2$All, begin = 1990, end = 2013)
+t_series[, 1:6] # print out few states smoothed time series data
 # Another example for limitted years
 ts_convert(testmod2$All[,1:5], begin = 1990, end = 1994)[,1:5] # print few states
 ```
 
-The remainings are details, and should be easy to understand, and possibly extand.
 
 ## Construct a barplot of the means
 
@@ -96,19 +105,20 @@ The ggplot2 package is used for most of the graphs in the original paper. This i
 ```{r}
 #intall.packages("ggplot2")
 library(ggplot2)
-barplotData<- RealValueConverter(testmod2$All)
+barplotData<- RealValueConverter(testmod2$All) # Use real values for the plot
 
-Per_Mean <-as.data.frame(apply(X=barplotData, MARGIN=1, FUN=mean))
+Per_Mean <-as.data.frame(apply(X=barplotData, MARGIN=1, FUN=mean)) # Compute means
+
 states<-c( "AL","AK","AZ","AR","CA","CO","CT","DE",
            "DC","FL","GA","HI","ID","IL","IN","IA",
            "KS","KY","LA","ME","MD","MA","MI","MN",
            "MS","MO","MT","NE","NV","NH","NJ","NM",
            "NY","NC","ND","OH","OK","OR","PA","RI",
            "SC","SD","TN","TX","UT","VT","VA","WA",
-           "WV","WI","WY") # Short state names
+           "WV","WI","WY") # States labels
 
-Period_Mean <- data.frame(states, Per_Mean) # create a dataframe with two variables
-names(Period_Mean) <- c("State", "Mean") # Create nicer variables names
+Period_Mean <- data.frame(states, Per_Mean) # create a dataframe. ggplot() requires a dataframe.
+names(Period_Mean) <- c("State", "Mean") # Change variables names
 
 Mean_Plot <- ggplot(Period_Mean, aes(reorder(State, Mean), Mean, fill=State)) +
   geom_bar(stat="identity") + coord_flip() + labs(y = "Study Period Average", 
@@ -126,14 +136,15 @@ print(Mean_Plot)
 The same function could be used to plot a barplot of the growth rate found in the paper. In the paper, the geometric growth rate is used. To compute the geometric growth rate, the average of the first three estimates are used as the initial value, and the average of the last three estimates are used as the end value.
 
 ## Construct a Map
-An extended tutorial on how to construct maps can be found at: http://flowingdata.com/2013/07/08/small-maps-and-grids/.
+An extended tutorial on how to construct maps can be found [here](http://flowingdata.com/2013/07/08/small-maps-and-grids/).
  In the paper, the maps constructed are based on three year moving average data. 
  
-The humcap package has three functions for constructing maps. The first function is  unimap(), which takes a vector of states data, and plot a single map.
-The scond function is multimap(), which takes a matrix of states data, and plots a frame of several small maps.
+The humcap package has three functions for constructing maps. The first function is  unimap(), and takes a vector of states data (for example estimates for a given year) to plot a single map.
+The scond function is multimap(), and takes a matrix of states data to plot a frame of several small maps.
 The third function, hc_map(), is a wrapper function, that is, it plots a single map if a vector data is provided, and multiple maps if a matrix is provided.
 
 Note: These functions require the packages maps, plyr, and mapproj.
+
 ### Illistration
 ```{r, warning=FALSE}
 library(maps)  	# To draw map
@@ -141,13 +152,16 @@ library(plyr)		# Data formatting
 library(mapproj)
 ```
 
-Example with a single vector is provided here:
+Example with a single vector.
 ```{r, fig.width= 7.2}
 hc_map(testmod2$All[,1]) # Plot a single map
 ```
 
-Example with a matrix of data is provided here:
+Example with a matrix of data.
 ```{r, fig.height= 6, fig.width= 7.2}
 smoothed_data <- smoother3(testmod2$All) #smooth the anual data first
 hc_map(smoothed_data)
 ```
+
+### Conclusion
+This introduction aims at showing the reader how the functions in the humcap package could be used. Again, the package is written to make the replication of the "Human Capital Measurement: A Quantiles Regression Approach" paper easy. This introduction does not include the shiny app of the paper. The app codes are availlable uppon request sent to sbikienga@husker.unl.edu. Also, a nice tutorial on building shiny apps can be found [here](http://shiny.rstudio.com/).
