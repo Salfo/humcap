@@ -74,8 +74,12 @@ The RealValueConverter() function converts the estimates (nominal values) into r
 data(testmod2) # load precomputed estimates of human capital premiums
 str(testmod2) # see what is in testmod2
 head(testmod2[[1]][,1:6]) # print out few estimates (Nominal values)
+```
 
-real_values <- RealValueConverter(df = testmod2[[1]], begin = 1990, 
+To use the `RealValueConverter()` function, you need to provide (1) the dataset to be converted, (2) a vector of cpi_index, (3) the index value, which is the cpi value for the base year; and (4) the beginning and ending years. Make sure to read the section CPI Data below.
+
+```{r}
+real_values <- RealValueConverter(df = testmod2[[1]], cpi = cpi_Ind, index = 232.957, begin = 1990, 
                         end = 2013)
 head(real_values[,1:6]) # print out few estimates (Real values)
 # Another example using RealValueConverter(). Note the changes in ending date
@@ -162,6 +166,11 @@ Example with a matrix of data.
 smoothed_data <- smoother3(testmod2$All) #smooth the anual data first
 hc_map(smoothed_data)
 ```
+
+### CPI Data
+
+The cpi data used are found [here](http://www.usinflationcalculator.com/inflation/consumer-price-index-and-annual-percent-changes-from-1913-to-2008/). The package come with prinstalled indexes from 1990 to 2013. In case you want to use data of after 2013, please copy the index vector [here](http://www.usinflationcalculator.com/inflation/consumer-price-index-and-annual-percent-changes-from-1913-to-2008/). It is imperative that you copy it starting from the year 1990. For instance, you can copy from 1990 to 2014, or 1990 to 2015, provided that the data are available. At the time of writing of these lines, 2015 data was not available. Just to repeat, the function requires a vector of indexes, which you can copy [here](http://www.usinflationcalculator.com/inflation/consumer-price-index-and-annual-percent-changes-from-1913-to-2008/). I use the annual averages column.
+
 
 ### Conclusion
 This introduction aims at showing the reader how the functions in the humcap package could be used. Again, the package is written to make the replication of the "Human Capital Measurement: A Quantiles Regression Approach" paper easy. This introduction does not include the shiny app of the paper. The app codes are availlable uppon request sent to sbikienga@husker.unl.edu. Also, a nice tutorial on building shiny apps can be found [here](http://shiny.rstudio.com/).
