@@ -46,7 +46,7 @@ multimap <- function(df, periods = c("1990-1992", "1991-1993", "1992-1994", "199
            ))))))
 
     for(j in 1:(ncol(dfNew)-1)){
-      states$mapdata <-states[,(j+4)]
+      states$mapdata <-states[,(j+3)]
       maprates <- states$mapdata[m]
 
       ## A helper for the color

@@ -19,7 +19,7 @@ RealValueConverter <- function(df, cpi = cpi_Ind, index=232.957, begin = 1990, e
   names(select) <-"Year"
   names(cpi) <- "CPI"
   init <- beg-1989
-  fin  <- end1+1 - begin
+  fin  <- end1 - 1989
   cpi_data <- data.frame(select, cpi[init:fin])
   cpi_data$coef<-cpi_data$cpi/index
 
